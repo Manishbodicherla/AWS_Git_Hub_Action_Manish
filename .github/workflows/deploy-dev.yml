@@ -1,5 +1,5 @@
 # .github/workflows/deploy-dev.yml
-name: Dev WorkFlow runnn
+name: DEV PIPELINE
 
 on:
   push:
