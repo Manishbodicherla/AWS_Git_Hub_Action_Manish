@@ -27,11 +27,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt  # Install dependencies from Lambda function 1's requirements.txt
 
+      # Create deployment package for Lambda Function 1
       - name: Create deployment package for Lambda Function 1
         run: |
-          cd aws/dev/lambda/Test_lambda1  # Change to the folder for Lambda function 1
-          zip -r Test_lambda1.zip Test_lambda1.py  # Zip the Lambda function code
+          cd aws/dev/lambda/Test_lambda1
+          zip -r lambda_function_1.zip .  # Zip all files in the directory
 
+      # Deploy Lambda Function 1
       - name: Deploy Lambda Function 1
         run: |
-          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1/Test_lambda1.zip
+          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1/lambda_function_1.zip    
