@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -33,45 +32,54 @@ jobs:
           cd aws/dev/lambda/Test_lambda1
           ls -al  # List files in the directory to ensure Test_lambda1.py exists
 
-      # Install dependencies for Lambda Function 1
-      - name: Install dependencies for Lambda Function 1
+      #- name: Install dependencies for all Lambda functions
         run: |
-          python -m pip install --upgrade pip
-          pip install -r aws/dev/lambda/Test_lambda1/requirements.txt  # Explicit path to requirements.txt
+          # Install dependencies for each Lambda function (if any requirements.txt exists)
+          for lambda_dir in aws/dev/lambda/*; do
+            if [ -d "$lambda_dir" ]; then
+              echo "Installing dependencies for $lambda_dir"
+              if [ -f "$lambda_dir/requirements.txt" ]; then
+                cd $lambda_dir
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+                cd -  # Go back to the original directory
+              fi
+            fi
+          done
 
-      # Create deployment package for Lambda Function 1
-      - name: Create deployment package for Lambda Function 1
+      - name: Zip all Lambda functions
         run: |
-          cd aws/dev/lambda/Test_lambda1
-          zip -r ../Test_lambda1.zip .  # Zip the files, and place the zip one level above
+          # Loop through each Lambda function directory and create a deployment package
+          for lambda_dir in aws/dev/lambda/*; do
+            if [ -d "$lambda_dir" ]; then
+              # Create the zip file for each Lambda function
+              lambda_name=$(basename "$lambda_dir")
+              zip -r "aws/dev/lambda/$lambda_name.zip" "$lambda_dir"
+            fi
+          done
 
-      - name: Create Lambda Function if Not Exists
+      - name: Deploy Lambda functions
         run: |
-          # Check if the Lambda function exists
-          if ! aws lambda get-function --function-name my-lambda-function-1 --region ap-northeast-1; then
-            echo "Lambda function does not exist, creating it."
-            # Create the Lambda function
-            aws lambda create-function \
-              --function-name my-lambda-function-1 \
-              --runtime python3.8 \
-              --role arn:aws:iam::596941798972:role/LambdaExecutionRole_GitHub_Actions \
-              --handler lambda_function.lambda_handler \
-              --zip-file fileb://aws/dev/lambda/Test_lambda1.zip \
-              --region ap-northeast-1
-          else
-            echo "Lambda function already exists."
-          fi
-
-      - name: Install dependencies for Lambda Function 1
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r aws/dev/lambda/Test_lambda1/requirements.txt  # Explicit path to requirements.txt
-
-      - name: Create deployment package for Lambda Function 1
-        run: |
-          cd aws/dev/lambda/Test_lambda1
-          zip -r ../Test_lambda1.zip .  # Zip the files
-
-      - name: Deploy Lambda Function 1
-        run: |
-          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1.zip --region ap-northeast-1    
+          # Loop through each Lambda function and deploy the zipped package
+          for lambda_dir in aws/dev/lambda/*; do
+            if [ -d "$lambda_dir" ]; then
+              lambda_name=$(basename "$lambda_dir")
+              # Check if the Lambda function exists
+              if ! aws lambda get-function --function-name $lambda_name --region us-east-1; then
+                echo "Lambda function $lambda_name does not exist, creating it."
+                aws lambda create-function \
+                  --function-name $lambda_name \
+                  --runtime python3.8 \
+                  --role arn:aws:iam::596941798972:role/LambdaExecutionRole_GitHub_Actions \
+                  --handler "$lambda_name.handler" \
+                  --zip-file fileb://aws/dev/lambda/$lambda_name.zip \
+                  --region us-east-1
+              else
+                echo "Updating Lambda function $lambda_name"
+                aws lambda update-function-code \
+                  --function-name $lambda_name \
+                  --zip-file fileb://aws/dev/lambda/$lambda_name.zip \
+                  --region us-east-1
+              fi
+            fi
+          done
