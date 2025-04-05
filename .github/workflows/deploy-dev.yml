@@ -54,7 +54,7 @@ jobs:
             aws lambda create-function \
               --function-name my-lambda-function-1 \
               --runtime python3.8 \
-              --role arn:aws:iam::123456789012:role/lambda-execution-role \
+              --role arn:aws:iam::596941798972:role/LambdaExecutionRole_GitHub_Actions \
               --handler lambda_function.lambda_handler \
               --zip-file fileb://aws/dev/lambda/Test_lambda1.zip \
               --region ap-northeast-1
