@@ -13,24 +13,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install Dependencies
+        run: |
+          npm install  # Or any other package installation step if required
+
+      - name: Create Deployment Package
+        run: |
+          zip -r my-deployment-package.zip .  # Create a zip package of the source code
+
       - name: Set up AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_KEY}}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION}}
+          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
       - name: Deploy Lambda Function
         run: |
-          # Example command to deploy Lambda (you can customize as needed)
           aws lambda update-function-code --function-name my-lambda --zip-file fileb://my-deployment-package.zip
-
-      - name: Deploy Glue Job
-        run: |
-          # Example command to trigger Glue job (customize as needed)
-          aws glue start-job-run --job-name my-glue-job
-
-      - name: Run Athena Query
-        run: |
-          # Example command to run Athena query
-          aws athena start-query-execution --query-string "SELECT * FROM my_table" --query-execution-context Database=my_database --result-configuration OutputLocation=s3://my-query-results/
