@@ -1,5 +1,6 @@
-name: Deploy Lambda Function to AWS
 
+# .github/workflows/deploy-dev.yml
+name: DEV PIPELINE
 on:
   push:
     branches:
