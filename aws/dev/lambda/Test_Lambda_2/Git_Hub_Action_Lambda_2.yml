@@ -1,0 +1,12 @@
+# Python script with a lambda function for checking a condition
+
+import os
+
+# Lambda function to check a build status
+check_success = lambda status: 'Build successful!' if status == 0 else 'Build failed.'
+
+# Simulate getting status from an environment variable (you can replace this with actual GitHub Actions environment variable)
+status = os.getenv('GITHUB_RUN_STATUS', '0')  # Default to '0' if the variable is not set
+
+# Check and print the result
+print(check_success(int(status)))
