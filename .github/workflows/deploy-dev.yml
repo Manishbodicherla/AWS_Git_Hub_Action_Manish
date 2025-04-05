@@ -27,20 +27,27 @@ jobs:
         with:
           python-version: '3.8'  # Choose the Python version that matches your Lambda runtime
 
-      # Lambda 1 - Install dependencies and deploy
+      # Debug: List files in Lambda function 1 directory
+      - name: List files in Lambda function 1 directory
+        run: |
+          cd aws/dev/lambda/Test_lambda1
+          ls -al  # List files in the directory to ensure Test_lambda1.py exists
+
+      # Install dependencies for Lambda Function 1
       - name: Install dependencies for Lambda Function 1
         run: |
-          cd aws/dev/lambda/Test_lambda1  # Change to the folder for Lambda function 1
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Install dependencies from Lambda function 1's requirements.txt
+          pip install -r aws/dev/lambda/Test_lambda1/requirements.txt  # Explicit path to requirements.txt
 
       # Create deployment package for Lambda Function 1
       - name: Create deployment package for Lambda Function 1
         run: |
           cd aws/dev/lambda/Test_lambda1
-          zip -r lambda_function_1.zip .  # Zip all files in the directory
+          zip -r ../Test_lambda1.zip .  # Zip the files, and place the zip one level above
 
       # Deploy Lambda Function 1
       - name: Deploy Lambda Function 1
         run: |
-          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1.zip    
+          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1.zip --region ap-northeast-1
+        env:
+          AWS_REGION: ap-northeast-1  # Set AWS region (change as needed)
