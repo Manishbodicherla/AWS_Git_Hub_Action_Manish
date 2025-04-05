@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -17,12 +17,18 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'  # Choose the Python version that matches your Lambda runtime
+          python-version: '3.8'  # Use your desired Python version
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Install the dependencies listed in requirements.txt
+          pip install -r requirements.txt  # Install Python dependencies
+
+      - name: Deploy Lambda Function (Example)
+        run: |
+          zip -r lambda_function.zip lambda_function.py  # Adjust based on your setup
+          aws lambda update-function-code --function-name my-lambda-function --zip-file fileb://lambda_function.zip
+
 
       - name: Create deployment package (zip)
         run: |
