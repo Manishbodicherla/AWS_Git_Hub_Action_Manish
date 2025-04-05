@@ -1,9 +1,9 @@
-name: Deploy Lambda Functions to AWS
+name: Git Hub Pipeline for Dev Environment
 
 on:
   push:
     branches:
-      - Dev  # Trigger deployment on push to the main branch
+      - Dev  # Trigger deployment on push to the Dev branch
 
 jobs:
   deploy:
@@ -31,9 +31,9 @@ jobs:
         run: |
           cd aws/dev/lambda/Test_lambda1
           ls -al  # List files in the directory to ensure Test_lambda1.py exists
-          done
 
       #- name: Install dependencies for all Lambda functions
+      - name: Install dependencies for all Lambda functions
         run: |
           # Install dependencies for each Lambda function (if any requirements.txt exists)
           for lambda_dir in aws/dev/lambda/*; do
