@@ -29,7 +29,7 @@ jobs:
       # Debug: List files in Lambda function 1 directory
       - name: List files in Lambda function 1 directory
         run: |
-          cd aws/dev/lambda/Test_lambda1
+          cd aws/dev/lambda
           ls -al  # List files in the directory to ensure Test_lambda1.py exists
 
       #- name: Install dependencies for all Lambda functions
