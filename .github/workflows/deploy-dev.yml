@@ -32,6 +32,8 @@ jobs:
           cd aws/dev/lambda/Test_lambda1
           ls -al  # List files in the directory to ensure Test_lambda1.py exists
 
+          done
+
       #- name: Install dependencies for all Lambda functions
         run: |
           # Install dependencies for each Lambda function (if any requirements.txt exists)
