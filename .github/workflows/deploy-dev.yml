@@ -18,7 +18,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}  
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}  
 
       # Set up Python environment
       - name: Set up Python environment
@@ -66,7 +66,7 @@ jobs:
             if [ -d "$lambda_dir" ]; then
               lambda_name=$(basename "$lambda_dir")
               # Check if the Lambda function exists
-              if ! aws lambda get-function --function-name $lambda_name --region us-east-1; then
+              if ! aws lambda get-function --function-name $lambda_name --region ${{ env.AWS_DEFAULT_REGION }}; then
                 echo "Lambda function $lambda_name does not exist, creating it."
                 aws lambda create-function \
                   --function-name $lambda_name \
@@ -74,13 +74,13 @@ jobs:
                   --role arn:aws:iam::596941798972:role/LambdaExecutionRole_GitHub_Actions \
                   --handler "$lambda_name.handler" \
                   --zip-file fileb://aws/dev/lambda/$lambda_name.zip \
-                  --region us-east-1
+                  --region ${{ env.AWS_DEFAULT_REGION }}
               else
                 echo "Updating Lambda function $lambda_name"
                 aws lambda update-function-code \
                   --function-name $lambda_name \
                   --zip-file fileb://aws/dev/lambda/$lambda_name.zip \
-                  --region us-east-1
+                  --region ${{ env.AWS_DEFAULT_REGION }}
               fi
             fi
           done
