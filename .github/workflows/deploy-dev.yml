@@ -1,6 +1,5 @@
+name: Deploy Lambda Functions to AWS
 
-# .github/workflows/deploy-dev.yml
-name: DEV PIPELINE
 on:
   push:
     branches:
@@ -11,36 +10,62 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Set up Python environment
       - name: Set up Python environment
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'  # Use your desired Python version
+          python-version: '3.8'  # Choose the Python version that matches your Lambda runtime
 
-      - name: Install dependencies
+      # Lambda 1 - Install dependencies and deploy
+      - name: Install dependencies for Lambda Function 1
         run: |
+          cd aws/dev/lambda/Test_lambda1  # Change to the folder for Lambda function 1
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Install Python dependencies
+          pip install -r requirements.txt  # Install dependencies from Lambda function 1's requirements.txt
 
-      - name: Deploy Lambda Function (Example)
+      - name: Create deployment package for Lambda Function 1
         run: |
-          zip -r lambda_function.zip lambda_function.py  # Adjust based on your setup
-          aws lambda update-function-code --function-name my-lambda-function --zip-file fileb://lambda_function.zip
+          cd aws/dev/lambda/Test_lambda1  # Change to the folder for Lambda function 1
+          zip -r Test_lambda1.zip Test_lambda1.py  # Zip the Lambda function code
 
-
-      - name: Create deployment package (zip)
+      - name: Deploy Lambda Function 1
         run: |
-          zip -r lambda_function.zip lambda_function.py  # Add lambda_function.py and dependencies to the zip
+          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1/Test_lambda1.zip
 
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      - name: Deploy Lambda function
+      # Lambda 2 - Install dependencies and deploy
+      - name: Install dependencies for Lambda Function 2
         run: |
-          aws lambda update-function-code --function-name my-lambda-function --zip-file fileb://lambda_function.zip
+          cd aws/dev/lambda/function2  # Change to the folder for Lambda function 2
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install dependencies from Lambda function 2's requirements.txt
+
+      - name: Create deployment package for Lambda Function 2
+        run: |
+          cd aws/dev/lambda/function2  # Change to the folder for Lambda function 2
+          zip -r function2.zip function2.py  # Zip the Lambda function code
+
+      - name: Deploy Lambda Function 2
+        run: |
+          aws lambda update-function-code --function-name my-lambda-function-2 --zip-file fileb://aws/dev/lambda/function2/function2.zip
+
+      # Repeat the above steps for additional Lambda functions...
+
+      # Lambda 3 - Install dependencies and deploy
+      - name: Install dependencies for Lambda Function 2
+        run: |
+          cd aws/dev/lambda/function1  # Change to the folder for Lambda function 2
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install dependencies from Lambda function 2's requirements.txt
+
+      - name: Create deployment package for Lambda Function 2
+        run: |
+          cd aws/dev/lambda/function1  # Change to the folder for Lambda function 2
+          zip -r function1.zip function1.py  # Zip the Lambda function code
+
+      - name: Deploy Lambda Function 1
+        run: |
+          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/function2/function1.zip
