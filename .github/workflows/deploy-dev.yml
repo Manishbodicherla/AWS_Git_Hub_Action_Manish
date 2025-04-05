@@ -45,9 +45,33 @@ jobs:
           cd aws/dev/lambda/Test_lambda1
           zip -r ../Test_lambda1.zip .  # Zip the files, and place the zip one level above
 
-      # Deploy Lambda Function 1
+      - name: Create Lambda Function if Not Exists
+        run: |
+          # Check if the Lambda function exists
+          if ! aws lambda get-function --function-name my-lambda-function-1 --region ap-northeast-1; then
+            echo "Lambda function does not exist, creating it."
+            # Create the Lambda function
+            aws lambda create-function \
+              --function-name my-lambda-function-1 \
+              --runtime python3.8 \
+              --role arn:aws:iam::123456789012:role/lambda-execution-role \
+              --handler lambda_function.lambda_handler \
+              --zip-file fileb://aws/dev/lambda/Test_lambda1.zip \
+              --region ap-northeast-1
+          else
+            echo "Lambda function already exists."
+          fi
+
+      - name: Install dependencies for Lambda Function 1
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r aws/dev/lambda/Test_lambda1/requirements.txt  # Explicit path to requirements.txt
+
+      - name: Create deployment package for Lambda Function 1
+        run: |
+          cd aws/dev/lambda/Test_lambda1
+          zip -r ../Test_lambda1.zip .  # Zip the files
+
       - name: Deploy Lambda Function 1
         run: |
-          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1.zip --region ap-northeast-1
-        env:
-          AWS_REGION: ap-northeast-1  # Set AWS region (change as needed)
+          aws lambda update-function-code --function-name my-lambda-function-1 --zip-file fileb://aws/dev/lambda/Test_lambda1.zip --region ap-northeast-1    
