@@ -25,16 +25,24 @@ jobs:
 
       - name: Run Pylint check
         run: |
-          # Run pylint on the codebase (you can adjust the path to your Lambda folder)
           pylint aws/dev/lambda --disable=R,C --max-line-length=120 --output-format=text > pylint_report.txt || true
+
+      - name: Debug: Print Pylint Report
+        run: |
+          cat pylint_report.txt  # This will show you the content of the pylint report
 
       - name: Extract Pylint score and check
         run: |
-          # Extract the score from the pylint report
-          score=$(tail -n 1 pylint_report.txt | awk '{print $1}')
+          # Extract the last line of the pylint report that contains the score
+          score_line=$(tail -n 1 pylint_report.txt)
+          echo "Pylint Report Last Line: $score_line"
+
+          # Extract the actual score (this assumes that the line contains a score like 'Your code has been rated at 10/10')
+          score=$(echo $score_line | grep -oP '\d+(\.\d+)?' | head -n 1)
+
           echo "Pylint Score: $score"
 
-          # Check if the score is a number and below 10
+          # Check if the score is a valid number
           if ! [[ "$score" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
             echo "Invalid score: $score. Skipping check."
             exit 1
@@ -45,8 +53,3 @@ jobs:
             echo "Pylint score is below 10, failing the workflow."
             exit 1
           fi
-
-      - name: Debug: Print Pylint Report
-           run: |
-              cat pylint_report.txt
-    
