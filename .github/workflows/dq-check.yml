@@ -25,8 +25,12 @@ jobs:
 
       - name: Run Pylint check
         run: |
-          # Run pylint on the Lambda code directory and output to a text file
-          pylint aws/dev/lambda --disable=R,C --max-line-length=120 --output-format=text > pylint_report.txt || true
+          # Run pylint on the Lambda code directory and output to a text file, allowing errors
+          pylint aws/dev/lambda --disable=missing-docstring --max-line-length=120 --output-format=text > pylint_report.txt || true
+
+      - name: Debug: Print Pylint Report
+        run: |
+          cat pylint_report.txt  # Show the content of pylint_report.txt to see the result
 
       - name: Extract Pylint score and check
         run: |
