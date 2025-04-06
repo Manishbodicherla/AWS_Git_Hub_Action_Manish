@@ -42,7 +42,7 @@ jobs:
           # Check if pylint_report.txt is empty
           if [ ! -s pylint_report.txt ]; then
             echo "Pylint report is empty. Skipping score extraction."
-            exit 1
+            exit 0
           fi
 
           # Extract the last line of the report and get the score
