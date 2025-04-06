@@ -45,3 +45,8 @@ jobs:
             echo "Pylint score is below 10, failing the workflow."
             exit 1
           fi
+
+      - name: Debug: Print Pylint Report
+           run: |
+              cat pylint_report.txt
+    

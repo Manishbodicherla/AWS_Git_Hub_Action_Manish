@@ -30,24 +30,7 @@ jobs:
       - name: Install pylint
         run: |
           python -m pip install --upgrade pip
-          pip install pylint
-
-      # Run pylint for Data Quality Check - Python Syntax Check
-      - name: Run Pylint check
-        run: |
-          # Run pylint on all Python files in the lambda folder
-          pylint aws/dev/lambda --disable=R,C --max-line-length=120 --output-format=text > pylint_report.txt || true
-
-      # Check if the Pylint score is 10, and fail if it’s below 10
-      - name: Check Pylint score
-        run: |
-          # Extract the score from pylint output
-          score=$(tail -n 1 pylint_report.txt | awk '{print $1}')
-          echo "Pylint Score: $score"
-          if [ $(echo "$score < 8" | bc) -eq 1 ]; then
-            echo "Pylint score is below 10, failing the workflow."
-            exit 1
-          fi    
+          pip install pylint    
 
       # Debug: List files in Lambda function 1 directory
       - name: List files in Lambda function 1 directory
