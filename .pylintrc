@@ -1,0 +1,22 @@
+[MASTER]
+# Disable warnings about missing __init__.py files
+disable=missing-module-docstring,missing-function-docstring
+
+# Set the maximum line length
+max-line-length=120
+
+[MESSAGES CONTROL]
+# Disable specific warnings
+disable=too-few-public-methods,too-many-instance-attributes
+
+[REPORTS]
+# Output format for reports (text-based)
+output-format=text
+
+[FORMAT]
+# Ignore long lines in the code
+max-line-length=120
+
+[DESIGN]
+# Set a threshold for too many arguments in functions
+max-args=5
