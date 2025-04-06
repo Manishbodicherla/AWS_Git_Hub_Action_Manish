@@ -24,7 +24,7 @@ jobs:
           pip install pylint
           sudo apt-get install jq
 
-      - name: Debug: List files in lambda directory
+      - name: "Debug: List files in lambda directory"
         run: |
           ls -al aws/dev/lambda/
           ls -al aws/dev/lambda/**/*.py
