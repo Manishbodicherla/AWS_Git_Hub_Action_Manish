@@ -23,9 +23,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pylint
 
-      - name: Run Pylint check
+      - name: Run Pylint check on Python files
         run: |
-          pylint aws/dev/lambda --disable=missing-docstring --max-line-length=120 --output-format=text --ignore="*.zip,*.txt,__init__.py" > pylint_report.txt || true
+          pylint aws/dev/lambda/**/*.py --disable=missing-docstring --max-line-length=120 --output-format=text > pylint_report.txt || true
 
       - name: Debug: Print Pylint Report
         run: |
