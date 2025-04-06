@@ -57,7 +57,7 @@ jobs:
             exit 1
           fi
 
-          if [ $(echo "$score < 10" | bc) -eq 1 ]; then
+          if [ $(echo "$score >= 0" | bc) -eq 1 ]; then
             echo "Pylint score is below 10, failing the workflow."
             exit 1
           fi
