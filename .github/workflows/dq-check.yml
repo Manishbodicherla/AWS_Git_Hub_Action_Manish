@@ -27,7 +27,7 @@ jobs:
         run: |
           pylint aws/dev/lambda/**/*.py --output-format=text > pylint_report.txt || true
 
-      - name: Debug: Print Pylint Report
+      - name: Debug Print Pylint Report
         run: |
           cat pylint_report.txt  # Show the full content of pylint_report.txt
           
