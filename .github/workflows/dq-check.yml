@@ -25,16 +25,24 @@ jobs:
 
       - name: Run Pylint check on Python files
         run: |
-          pylint aws/dev/lambda/**/*.py --disable=missing-docstring --max-line-length=120 --output-format=text > pylint_report.txt || true
+          pylint aws/dev/lambda/**/*.py --output-format=text > pylint_report.txt || true
 
-      - name: Debug Print Pylint Report
+      - name: Debug: Print Pylint Report
         run: |
           cat pylint_report.txt  # Show the full content of pylint_report.txt
-
+          
       - name: Extract Pylint score and check
         run: |
+          # Check if pylint_report.txt is empty
+          if [ ! -s pylint_report.txt ]; then
+            echo "Pylint report is empty. Skipping score extraction."
+            exit 1
+          fi
+          
+          # Extract the last line of the report and get the score
           score_line=$(tail -n 1 pylint_report.txt)
           echo "Pylint Report Last Line: $score_line"
+          
           score=$(echo $score_line | grep -oP '\d+(\.\d+)?' | head -n 1)
           echo "Pylint Score: $score"
           
