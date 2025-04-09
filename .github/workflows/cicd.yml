@@ -1,4 +1,4 @@
-name: Deploy AWS Resources
+name: Deploy Lambda Function
 
 on:
   push:
@@ -12,9 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Check out repository
       - name: Check out repository
         uses: actions/checkout@v3
 
+      # Step 2: Configure AWS CLI
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -22,22 +24,35 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
+      # Step 3: Set Environment Variables
       - name: Set Environment Variables
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/Child_Branch" ]]; then
-            export STACK_NAME=${{ secrets.DEV_STACK_NAME }}
+            export ENVIRONMENT="dev"
+            export S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }}
           elif [[ "${{ github.ref }}" == "refs/heads/qa" ]]; then
-            export STACK_NAME=${{ secrets.QA_STACK_NAME }}
+            export ENVIRONMENT="qa"
+            export S3_BUCKET_NAME=${{ secrets.QA_S3_BUCKET_NAME }}
           else
-            export STACK_NAME=${{ secrets.MASTER_STACK_NAME }}
+            export ENVIRONMENT="master"
+            export S3_BUCKET_NAME=${{ secrets.MASTER_S3_BUCKET_NAME }}
           fi
+          echo "Environment: $ENVIRONMENT"
+          echo "S3 Bucket Name: $S3_BUCKET_NAME"
+          echo "STACK_NAME=lambda-stack-${ENVIRONMENT}" >> $GITHUB_ENV
 
-      - name: Debug Stack Name
-        run: echo "Stack Name: $STACK_NAME"
+      # Step 4: Debug Environment
+      - name: Debug Environment Variables
+        run: |
+          echo "Environment: $ENVIRONMENT"
+          echo "S3 Bucket Name: $S3_BUCKET_NAME"
+          echo "Stack Name: $STACK_NAME"
 
+      # Step 5: Deploy CloudFormation Stack
       - name: Deploy CloudFormation Stack
         run: |
           aws cloudformation deploy \
             --stack-name $STACK_NAME \
-            --template-file ./Template/$ENVIRONMENT/lambda-template.yaml \
+            --template-file ./Template/$ENVIRONMENT/lambda-template.yml \
+            --parameter-overrides Environment=$ENVIRONMENT S3Bucket=$S3_BUCKET_NAME \
             --capabilities CAPABILITY_NAMED_IAM
