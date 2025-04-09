@@ -1,6 +1,12 @@
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+name: Deploy AWS Resources
+
+on:
+  push:
+    branches:
+      - Child_Branch   # Trigger for dev
+      - qa             # Trigger for qa
+      - main           # Trigger for master
+
 
     steps:
       - name: Check out repository
