@@ -53,6 +53,6 @@ jobs:
         run: |
           aws cloudformation deploy \
             --stack-name $STACK_NAME \
-            --template-file ./Template/Dev/lambda-template.yml \
+            --template-file ./Template/dev/lambda-template.yaml \
             --parameter-overrides Environment=$ENVIRONMENT S3Bucket=$S3_BUCKET_NAME \
             --capabilities CAPABILITY_NAMED_IAM
