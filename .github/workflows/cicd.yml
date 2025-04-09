@@ -1,24 +1,50 @@
+name: Deploy AWS Resources
+
+# Trigger events
+on:
+  push:
+    branches:
+      - Child_Branch   # Trigger for dev
+      - qa             # Trigger for qa
+      - main           # Trigger for master
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Specify the runner environment
 
     steps:
+      # Step 1: Check out the code
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Set Environment Variables
+      # Step 2: Set up AWS CLI
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      # Step 3: Dynamically load environment variables
+      - name: Load Environment Variables
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/Child_Branch" ]]; then
             export STACK_NAME=${{ secrets.DEV_STACK_NAME }}
+            export ENVIRONMENT="dev"
           elif [[ "${{ github.ref }}" == "refs/heads/qa" ]]; then
             export STACK_NAME=${{ secrets.QA_STACK_NAME }}
+            export ENVIRONMENT="qa"
           else
             export STACK_NAME=${{ secrets.MASTER_STACK_NAME }}
+            export ENVIRONMENT="master"
           fi
+          echo "Environment: $ENVIRONMENT"
+          echo "Stack Name: $STACK_NAME"
 
+      # Step 4: Deploy resources using AWS CloudFormation
       - name: Deploy CloudFormation Stack
         run: |
           aws cloudformation deploy \
             --stack-name $STACK_NAME \
-            --template-file ./Template/${ENVIRONMENT}/${SERVICE}-template.yaml \
+            --template-file ./Template/$ENVIRONMENT/lambda-template.yaml \
             --capabilities CAPABILITY_NAMED_IAM
