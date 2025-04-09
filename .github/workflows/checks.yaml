@@ -1,4 +1,4 @@
-name: DQ Check for Python Code (Pylint)
+'''name: DQ Check for Python Code (Pylint)
 
 on:
   pull_request:
@@ -61,3 +61,26 @@ jobs:
             echo "Pylint score is below 10, failing the workflow."
             exit 0
           fi
+end of previous checkc'''
+
+name: Code Quality Checks
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - qa
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Install Python Dependencies
+        run: pip install pylint
+
+      - name: Run Pylint
+        run: pylint AWS/**/*.py

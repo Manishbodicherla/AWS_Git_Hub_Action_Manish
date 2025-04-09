@@ -1,4 +1,4 @@
-name: Git Hub Pipeline for Dev Environment
+'''name: Git Hub Pipeline for Dev Environment
 
 on:
   push:
@@ -89,4 +89,41 @@ jobs:
                   --region ${{ env.AWS_DEFAULT_REGION }}
               fi
             fi
-          done
+          done 
+
+          End of previous workflow '''
+
+ name: Deploy AWS Resources
+
+on:
+  push:
+    branches:
+      - Dev   # Trigger for dev
+      - qa        # Trigger for qa
+      - main      # Trigger for master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Load Environment Variables
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/Dev" ]]; then
+            source ./environment/dev.env
+          elif [[ "${{ github.ref }}" == "refs/heads/qa" ]]; then
+            source ./environment/qa.env
+          else
+            source ./environment/master.env
+          fi
+
+      - name: Deploy CloudFormation Stack
+        run: |
+          aws cloudformation deploy \
+            --stack-name ${STACK_NAME} \
+            --template-file ./Template/${ENVIRONMENT}/${SERVICE}-template.yaml \
+            --capabilities CAPABILITY_NAMED_IAM
+         
