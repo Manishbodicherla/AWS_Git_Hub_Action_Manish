@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - Child_Branch   # Trigger for dev
-      - qa        # Trigger for qa
-      - main      # Trigger for master
+      - qa             # Trigger for qa
+      - main           # Trigger for master
 
 jobs:
   deploy:
@@ -16,15 +16,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Load Environment Variables
-           run: |
-              if [[ "${{ github.ref }}" == "refs/heads/Child_Branch" ]]; then
-                source ./environment/dev.env
-              elif [[ "${{ github.ref }}" == "refs/heads/qa" ]]; then
-                source ./environment/qa.env
-              else
-                source ./environment/master.env
-              fi
-
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/Child_Branch" ]]; then
+            source ./environment/dev.env
+          elif [[ "${{ github.ref }}" == "refs/heads/qa" ]]; then
+            source ./environment/qa.env
+          else
+            source ./environment/master.env
+          fi
 
       - name: Deploy CloudFormation Stack
         run: |
@@ -32,4 +31,3 @@ jobs:
             --stack-name ${STACK_NAME} \
             --template-file ./Template/${ENVIRONMENT}/${SERVICE}-template.yaml \
             --capabilities CAPABILITY_NAMED_IAM
-         
