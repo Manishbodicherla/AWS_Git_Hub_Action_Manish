@@ -7,12 +7,15 @@ on:
       - qa             # Trigger for qa
       - main           # Trigger for master
 
+jobs:                  # Define your jobs here
+  deploy:              # Job name (e.g., deploy)
+    runs-on: ubuntu-latest  # Specify the runner
 
-    steps:
+    steps:             # Define steps for this job
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # GitHub Action to check out your code
 
-      - name: Set Environment Variables
+      - name: Load Environment Variables
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/Child_Branch" ]]; then
             export AWS_ACCOUNT_ID=${{ secrets.DEV_AWS_ACCOUNT_ID }}
