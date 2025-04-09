@@ -1,36 +1,18 @@
-name: Deploy AWS Resources
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-on:
-  push:
-    branches:
-      - Child_Branch   # Trigger for dev
-      - qa             # Trigger for qa
-      - main           # Trigger for master
-
-jobs:                  # Define your jobs here
-  deploy:              # Job name (e.g., deploy)
-    runs-on: ubuntu-latest  # Specify the runner
-
-    steps:             # Define steps for this job
+    steps:
       - name: Check out repository
-        uses: actions/checkout@v3  # GitHub Action to check out your code
+        uses: actions/checkout@v3
 
-      - name: Load Environment Variables
+      - name: Set Environment Variables
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/Child_Branch" ]]; then
-            export AWS_ACCOUNT_ID=${{ secrets.DEV_AWS_ACCOUNT_ID }}
-            export AWS_REGION=${{ secrets.DEV_AWS_REGION }}
-            export S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }}
             export STACK_NAME=${{ secrets.DEV_STACK_NAME }}
           elif [[ "${{ github.ref }}" == "refs/heads/qa" ]]; then
-            export AWS_ACCOUNT_ID=${{ secrets.QA_AWS_ACCOUNT_ID }}
-            export AWS_REGION=${{ secrets.QA_AWS_REGION }}
-            export S3_BUCKET_NAME=${{ secrets.QA_S3_BUCKET_NAME }}
             export STACK_NAME=${{ secrets.QA_STACK_NAME }}
           else
-            export AWS_ACCOUNT_ID=${{ secrets.MASTER_AWS_ACCOUNT_ID }}
-            export AWS_REGION=${{ secrets.MASTER_AWS_REGION }}
-            export S3_BUCKET_NAME=${{ secrets.MASTER_S3_BUCKET_NAME }}
             export STACK_NAME=${{ secrets.MASTER_STACK_NAME }}
           fi
 
